@@ -171,7 +171,7 @@ impl<'a> Tokinzer<'a> {
         let mut unicode = self.chars.by_ref().take(4).map(|(_, ch)| ch);
 
         if unicode.all(|ch| ch.is_ascii_hexdigit()) {
-            return String::from_iter(unicode).parse::<u16>().unwrap();
+            return String::from_iter(unicode).parse::<u16>().expect("unable to parse u16");
         }
         
         0
