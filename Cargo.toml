@@ -1,0 +1,10 @@
+[package]
+name = "shipthatcode-build-json-parser-rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[[bin]]
+name = "shipthatcode-build-json-parser-rust"
+path = "main.rs"

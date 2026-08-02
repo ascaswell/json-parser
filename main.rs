@@ -7,6 +7,7 @@ fn main() {
     for line in stdin.lock().lines() {
         let l = line.unwrap();
         if l.is_empty() { continue; }
-        println!("TODO");
+        
+        
     }
 }
