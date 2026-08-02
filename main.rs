@@ -1,4 +1,4 @@
-use std::{char, io::{self, BufRead}, iter::Peekable, str::Chars};
+use std::{char, io::{self, BufRead}, iter::Peekable, str::CharIndices};
 
 // TODO (json-tokenize): implement per the lesson description.
 
@@ -14,26 +14,26 @@ fn main() {
 }
 
 pub struct Tokinzer<'a> {
-    chars: Peekable<Chars<'a>>,
+    chars: Peekable<CharIndices<'a>>,
 }
 
 impl<'a> Tokinzer<'a> {
     pub fn new(input: &'a str) -> Self{
         Tokinzer {
-            chars: input.chars().peekable(),
+            chars: input.char_indices().peekable(),
         }
     }
 
-    fn peek(&mut self) -> Option<char> {
+    fn peek(&mut self) -> Option<(usize, char)> {
         self.chars.peek().copied()
     }
 
-    fn next(&mut self) -> Option<char> {
+    fn next(&mut self) -> Option<(usize, char)> {
         self.chars.next()
     }
 
     fn skip_whitespace(&mut self) {
-        while let Some(ch) = self.peek() {
+        while let Some((_, ch)) = self.peek() {
             if ch.is_whitespace() {
                 self.next();
             }
@@ -44,7 +44,7 @@ impl<'a> Tokinzer<'a> {
     }
 
     pub fn tokenize(&mut self) { 
-        while let Some(ch) = self.peek() {
+        while let Some((idx, ch)) = self.peek() {
             match ch {
                 '{' | '}' | '[' | ']' | ':' | ',' => {
                     println!("PUNCT {}", ch);
@@ -70,7 +70,7 @@ impl<'a> Tokinzer<'a> {
                     }
                 },
                 _ => {
-                    println!("ERR unknown token");
+                    println!("ERR unexpected character {} at position {}", ch, idx);
                     break;
                 }
             }
@@ -84,7 +84,7 @@ impl<'a> Tokinzer<'a> {
 
         let mut result = String::new();
 
-        while let Some(ch) = self.next() {
+        while let Some((_, ch)) = self.next() {
             if ch == '"' {
                 break;
             }
@@ -99,14 +99,14 @@ impl<'a> Tokinzer<'a> {
 
         let mut number = String::new();
 
-        while let Some(ch) = self.peek() {
+        while let Some((_, ch)) = self.peek() {
             if ch.is_ascii_digit()
             || ch == '.'
             || ch == '-'
             || ch == '+'
             || ch == 'e'
             || ch == 'E' {
-                number.push(self.next().unwrap());
+                number.push(self.next().unwrap().1);
             }
             else {
                 break;
@@ -119,9 +119,9 @@ impl<'a> Tokinzer<'a> {
     fn read_value(&mut self) -> String {
         let mut value  = String::new();
 
-        while let Some(ch) = self.peek() {
+        while let Some((_, ch)) = self.peek() {
             if ch.is_ascii_alphabetic() {
-                value.push(self.next().unwrap());
+                value.push(self.next().unwrap().1);
             }
             else {
                 break;
