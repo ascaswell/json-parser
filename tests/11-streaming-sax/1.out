@@ -1,0 +1,4 @@
+START_OBJECT
+KEY name
+STRING alice
+END_OBJECT

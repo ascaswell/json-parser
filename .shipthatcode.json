@@ -1,0 +1,58 @@
+{
+  "course": "build-json-parser",
+  "language": "rust",
+  "language_id": 73,
+  "entrypoint": "main.rs",
+  "version": 1,
+  "content_hash": "bc0f110653cd26c9",
+  "lessons": [
+    {
+      "slug": "json-tokenize",
+      "tests_hash": "bd15ccd2593e"
+    },
+    {
+      "slug": "string-escapes",
+      "tests_hash": "1888f1e6bc26"
+    },
+    {
+      "slug": "scalar-values",
+      "tests_hash": "e981ce60580b"
+    },
+    {
+      "slug": "number-grammar",
+      "tests_hash": "5199dd35faf0"
+    },
+    {
+      "slug": "parse-array",
+      "tests_hash": "32f73f9875b4"
+    },
+    {
+      "slug": "parse-object",
+      "tests_hash": "64002b4dc0db"
+    },
+    {
+      "slug": "nested-recursive",
+      "tests_hash": "382660df0f0d"
+    },
+    {
+      "slug": "errors-positions",
+      "tests_hash": "b346371687b4"
+    },
+    {
+      "slug": "serialize",
+      "tests_hash": "6a58d29b9026"
+    },
+    {
+      "slug": "full-parser",
+      "tests_hash": "efcf1b92e47d"
+    },
+    {
+      "slug": "streaming-sax",
+      "tests_hash": "0b725f04c358"
+    },
+    {
+      "slug": "pretty-printer",
+      "tests_hash": "87d93dfac859"
+    }
+  ]
+}
