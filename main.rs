@@ -101,6 +101,7 @@ impl<'a> Tokinzer<'a> {
         self.next();
 
         let mut result = String::new();
+        let mut closing_quote_seen = false;
 
         while let Some((idx, ch)) = self.next() {
             if ch == '\\' {
@@ -122,13 +123,19 @@ impl<'a> Tokinzer<'a> {
                     },
                 }
             } else if ch == '"' {
+                closing_quote_seen = true;
                 break;
             } else {
                 result.push(ch);
             }
         }
 
+        if closing_quote_seen {
         Ok(result)
+        }
+        else {
+            Err(TokinzerError::StringNotTerminated)
+        }
     }
 
     fn read_number(&mut self) -> String {
@@ -173,4 +180,5 @@ impl<'a> Tokinzer<'a> {
 
 enum TokinzerError {
     InvalidToken(char, usize),
+    StringNotTerminated,
 }
