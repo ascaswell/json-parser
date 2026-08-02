@@ -51,11 +51,7 @@ impl<'a> Tokinzer<'a> {
                     self.next();
                 },
                 '"' => { 
-                    let string = self.read_string();
-                    print!("STRING ");
-                    for line in string.lines() {
-                        println!("{}", line);
-                    }
+                    println!("STRING {}", self.read_string());
                 },
                 ch if ch.is_ascii_digit() || ch == '-' => {
                     println!("NUMBER {}", self.read_number());
@@ -89,13 +85,22 @@ impl<'a> Tokinzer<'a> {
         let mut result = String::new();
 
         while let Some((_, ch)) = self.next() {
-            if ch == '"' {
+            if ch == '\\' {
+                match self.next().unwrap().1 {
+                    'n' => {result.push('\n')},
+                    't' => {result.push('\t')},
+                    'r' => {result.push('\r')},
+                    '"' => {result.push('"')},
+                    '\\' => {result.push('\\')},
+                    _ => { continue }
+
+                }
+
+            } else if ch == '"' {
                 break;
+            } else {
+                result.push(ch);
             }
-
-
-
-            result.push(ch);
         }
 
         result
