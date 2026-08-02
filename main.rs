@@ -70,7 +70,7 @@ impl<'a> Tokinzer<'a> {
                     }
                 },
                 _ => {
-                    println!("ERR unexpected character {} at position {}", ch, idx);
+                    println!("ERR unexpected character '{}' at position {}", ch, idx);
                     return;
                 }
             }
