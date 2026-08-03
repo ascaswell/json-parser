@@ -1,7 +1,7 @@
 use std::{
     char,
     io::{self, BufRead},
-    iter::{FromIterator, Peekable},
+    iter::Peekable,
     str::CharIndices,
 };
 
@@ -102,6 +102,7 @@ impl<'a> Tokinzer<'a> {
 
         let mut result = String::new();
         let mut closing_quote_seen = false;
+        let mut previous_unicode = None;
 
         while let Some((idx, ch)) = self.next() {
             if ch == '\\' {
@@ -116,6 +117,15 @@ impl<'a> Tokinzer<'a> {
                     '/' => result.push('/'),
                     'u' => {
                         let x = self.get_unicode_unit();
+                        previous_unicode = Some(x);
+
+                        if let Some(prev) = previous_unicode {
+
+                        }
+                        else {
+
+                        }
+                        result.push(x as u8 as char);
                     }
 
                     _ => {
@@ -168,13 +178,9 @@ impl<'a> Tokinzer<'a> {
     }
 
     fn get_unicode_unit(&mut self) -> u16 {
-        let mut unicode = self.chars.by_ref().take(4).map(|(_, ch)| ch);
+        let unicode: String = self.chars.by_ref().take(4).map(|(_, ch)| ch).collect();
 
-        if unicode.all(|ch| ch.is_ascii_hexdigit()) {
-            return String::from_iter(unicode).parse::<u16>().expect("unable to parse u16");
-        }
-        
-        0
+        u16::from_str_radix(&unicode, 16).unwrap()
     }
 }
 
