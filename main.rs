@@ -56,16 +56,15 @@ impl<'a> Tokinzer<'a> {
                     println!("PUNCT {}", ch);
                     self.next();
                 }
-                '"' => {
-                    match self.read_string() {
-                        Ok(string) => { println!("{}", string); },
-                        Err(_) => { 
-                            println!("ERR");
-                            return;
-                        }
+                '"' => match self.read_string() {
+                    Ok(string) => {
+                        println!("{}", string);
                     }
-                    
-                }
+                    Err(_) => {
+                        println!("ERR");
+                        return;
+                    }
+                },
                 ch if ch.is_ascii_digit() || ch == '-' => {
                     println!("NUMBER {}", self.read_number());
                 }
@@ -102,35 +101,22 @@ impl<'a> Tokinzer<'a> {
 
         let mut result = String::new();
         let mut closing_quote_seen = false;
-        let mut previous_unicode = None;
 
         while let Some((idx, ch)) = self.next() {
             if ch == '\\' {
-                match self.next().unwrap().1 {
-                    'b' => result.push(char::from(0x08)),
-                    'f' => result.push(char::from(0x0C)),
-                    'n' => result.push('\n'),
-                    't' => result.push('\t'),
-                    'r' => result.push('\r'),
-                    '"' => result.push('"'),
-                    '\\' => result.push('\\'),
-                    '/' => result.push('/'),
-                    'u' => {
-                        let x = self.get_unicode_unit();
-                        previous_unicode = Some(x);
-
-                        if let Some(prev) = previous_unicode {
-
-                        }
-                        else {
-
-                        }
-                        result.push(x as u8 as char);
+                if let Some((idx, ch)) = self.next() {
+                    match ch {
+                        'b' => result.push(char::from(0x08)),
+                        'f' => result.push(char::from(0x0C)),
+                        'n' => result.push('\n'),
+                        't' => result.push('\t'),
+                        'r' => result.push('\r'),
+                        '"' => result.push('"'),
+                        '\\' => result.push('\\'),
+                        '/' => result.push('/'),
+                        'u' => self.process_unicode(&mut result).unwrap(),
+                        _ => return Err(TokinzerError::InvalidToken(ch, idx)),
                     }
-
-                    _ => {
-                        return Err(TokinzerError::InvalidToken(ch, idx))
-                    },
                 }
             } else if ch == '"' {
                 closing_quote_seen = true;
@@ -141,9 +127,8 @@ impl<'a> Tokinzer<'a> {
         }
 
         if closing_quote_seen {
-        Ok(result)
-        }
-        else {
+            Ok(result)
+        } else {
             Err(TokinzerError::StringNotTerminated)
         }
     }
@@ -177,14 +162,48 @@ impl<'a> Tokinzer<'a> {
         value
     }
 
-    fn get_unicode_unit(&mut self) -> u16 {
-        let unicode: String = self.chars.by_ref().take(4).map(|(_, ch)| ch).collect();
+    fn process_unicode(&mut self, result: &mut String) -> Result<(), TokinzerError> {
+        let unicode_string: String = self.chars.by_ref().take(4).map(|(_, ch)| ch).collect();
 
-        u16::from_str_radix(&unicode, 16).unwrap()
+        let mut raw_unicode = vec![];
+
+        if let Ok(unicode) = u16::from_str_radix(&unicode_string, 16) {
+            raw_unicode.push(unicode);
+
+            if (0xD800..=0xDBFF).contains(&unicode) {
+                // surrogate pair
+                let unicode_string: String =
+                    self.chars.by_ref().take(2).map(|(_, ch)| ch).collect();
+
+                if unicode_string != "\\u" {
+                    return Err(TokinzerError::InvalidUnicodeEscape);
+                }
+
+                let unicode_string: String =
+                    self.chars.by_ref().take(4).map(|(_, ch)| ch).collect();
+
+                if let Ok(unicode) = u16::from_str_radix(&unicode_string, 16) {
+                    raw_unicode.push(unicode);
+                } else {
+                    return Err(TokinzerError::InvalidUnicodeEscape);
+                }
+            }
+
+            if let Ok(s) = String::from_utf16(&[unicode]) {
+                result.push_str(&s);
+                Ok(())
+            } else {
+                Err(TokinzerError::InvalidUnicodeEscape)
+            }
+        } else {
+            return Err(TokinzerError::InvalidUnicodeEscape);
+        }
     }
 }
 
+#[derive(Debug)]
 enum TokinzerError {
     InvalidToken(char, usize),
     StringNotTerminated,
+    InvalidUnicodeEscape,
 }
