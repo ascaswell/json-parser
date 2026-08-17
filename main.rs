@@ -138,7 +138,7 @@ impl<'a> Tokinzer<'a> {
             }
         }
 
-        if number.contains(&['.','e','E']) {
+        if number.contains('.') || number.contains('e') || number.contains('E') {
             let x = f64::from_str(&number).unwrap();
             if x.fract() == 0.0 {
                 number = format!("{:.1}", x);
