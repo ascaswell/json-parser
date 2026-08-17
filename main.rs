@@ -1,8 +1,5 @@
 use std::{
-    char,
-    io::{self, BufRead},
-    iter::Peekable,
-    str::CharIndices,
+    char, fmt::format, io::{self, BufRead}, iter::Peekable, str::{CharIndices, FromStr},
 };
 
 // TODO (json-tokenize): implement per the lesson description.
@@ -58,7 +55,7 @@ impl<'a> Tokinzer<'a> {
                 }
                 '"' => match self.read_string() {
                     Ok(string) => {
-                        println!("{}", string);
+                        println!("'{}'", string);
                     }
                     Err(_) => {
                         println!("ERR");
@@ -66,31 +63,27 @@ impl<'a> Tokinzer<'a> {
                     }
                 },
                 ch if ch.is_ascii_digit() || ch == '-' => {
-                    println!("NUMBER {}", self.read_number());
+                    println!("{}", self.read_number());
                 }
                 ch if ch.is_whitespace() => {
                     self.skip_whitespace();
                 }
-                't' | 'f' | 'n' => {
+                _ => {
                     let value = self.read_value();
                     match value.as_str() {
                         "true" => {
-                            println!("TRUE {}", value);
+                            println!("True");
                         }
                         "false" => {
-                            println!("FALSE {}", value);
+                            println!("False");
                         }
                         "null" => {
-                            println!("NULL {}", value);
+                            println!("None");
                         }
                         _ => {
-                            println!("ERR invalid token {}", value);
+                            println!("ERR not a JSON literal: '{}'", value);
                         }
                     }
-                }
-                _ => {
-                    println!("ERR unexpected character '{}' at position {}", ch, idx);
-                    return;
                 }
             }
         }
@@ -145,6 +138,16 @@ impl<'a> Tokinzer<'a> {
             }
         }
 
+        if number.contains('.') {
+            let x = f64::from_str(&number).unwrap();
+            if x.fract() == 0.0 {
+                number = format!("{:.1}", x);
+            }
+            else { 
+                number = format!("{}", x);
+            }
+        }
+    
         number
     }
 
