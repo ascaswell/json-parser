@@ -1,5 +1,5 @@
 use std::{
-    char, fmt::format, io::{self, BufRead}, iter::Peekable, str::{CharIndices, FromStr},
+    char, io::{self, BufRead}, iter::Peekable, str::{CharIndices, FromStr},
 };
 
 // TODO (json-tokenize): implement per the lesson description.
