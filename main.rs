@@ -150,7 +150,7 @@ impl<'a> Tokinzer<'a> {
         else {
             let x = i64::from_str(&number).unwrap();
 
-            number =  format!("{}", number);
+            number =  format!("{}", x);
         }
     
         number
