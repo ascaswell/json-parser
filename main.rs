@@ -138,7 +138,7 @@ impl<'a> Tokinzer<'a> {
             }
         }
 
-        if number.contains('.') {
+        if number.contains(&['.','e','E']) {
             let x = f64::from_str(&number).unwrap();
             if x.fract() == 0.0 {
                 number = format!("{:.1}", x);
@@ -146,6 +146,11 @@ impl<'a> Tokinzer<'a> {
             else { 
                 number = format!("{}", x);
             }
+        }
+        else {
+            let x = i64::from_str(&number).unwrap();
+
+            number =  format!("{}", number);
         }
     
         number
