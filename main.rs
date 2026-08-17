@@ -189,7 +189,7 @@ impl<'a> Tokinzer<'a> {
                 }
             }
 
-            if let Ok(s) = String::from_utf16(&[unicode]) {
+            if let Ok(s) = String::from_utf16(&raw_unicode) {
                 result.push_str(&s);
                 Ok(())
             } else {
